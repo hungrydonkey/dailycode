@@ -19,7 +19,7 @@ void show(){
 	printf("\n");
 }
 
-void Aproducer(){
+void Aproducer(void* args){
 	int t = 1;
 	while(t <= PM-1){
 		
@@ -50,7 +50,7 @@ void Aproducer(){
 }
 
 
-void Bproducer(){
+void Bproducer(void* args){
 	int t = 1;
 	while(t <= PM-1){
 		
@@ -81,7 +81,7 @@ void Bproducer(){
 
 }
 
-void Cproducer(){
+void Cproducer(void* args){
 	int t = 1;
 	while(t <= PM-1){	
 		sem_wait(&empty);
@@ -110,7 +110,7 @@ void Cproducer(){
 	pthread_exit(NULL);
 }
 
-void consumerA(){
+void consumerA(void* args){
 	int t = 1,a;
 	while(t <= CM){
 		sem_wait(&prdn);
@@ -145,7 +145,7 @@ void consumerA(){
 
 }
 
-void consumerB(){
+void consumerB(void* args){
 	int t = 1,a;
 	while(t <= CM){
 		sem_wait(&prdn);
