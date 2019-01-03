@@ -54,9 +54,6 @@ void producer(void* args){
 	pthread_exit(NULL);
 }
 
-
-
-
 void consumer(void* args){
 	int t = 1,a;
 	while(t <= CM){
@@ -89,7 +86,6 @@ void consumer(void* args){
 		t++;
 	}
 	pthread_exit(NULL);
-
 }
 
 int main()
