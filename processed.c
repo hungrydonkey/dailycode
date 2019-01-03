@@ -8,6 +8,11 @@
 #define PM 6
 #define CM 10
 
+typedef struct {
+	char *na;
+	int jo;
+}my_args;
+
 int *buffer;//buffer
 sem_t mutex;//buffer mutex
 sem_t prdn;// production
@@ -19,14 +24,14 @@ void show(){
 	printf("\n");
 }
 
-void Aproducer(void* args){
+void producer(void* args){
 	int t = 1;
 	while(t <= PM-1){
 		
 		sem_wait(&empty);
 		sem_wait(&mutex);
-		printf("PAid:%u\n",(unsigned int)pthread_self());
-		printf("PA %d begin:",t);
+		printf("%sid:%u\n",((my_args*)args) ->na,(unsigned int)pthread_self());
+		printf("%s %d begin:",((my_args*)args) ->na,t);
 		show();
 		for(int a = 0;a < PM;a++){
 			if(buffer[a] == 0){
@@ -35,11 +40,11 @@ void Aproducer(void* args){
 				break;
 			}
 		}
-		printf("PAend:     ");
+		printf("%send:     ",((my_args*)args) ->na);
 		show();
 		sleep(1);
 		if(t == PM-1){
-			printf("PA EXIT\n");
+			printf("%s EXIT\n",((my_args*)args) ->na);
 		}
 		printf("\n");
 		sem_post(&mutex);
@@ -50,78 +55,20 @@ void Aproducer(void* args){
 }
 
 
-void Bproducer(void* args){
-	int t = 1;
-	while(t <= PM-1){
-		
-		sem_wait(&empty);
-		sem_wait(&mutex);
-		printf("PBid:%u\n",(unsigned int)pthread_self());
-		printf("PB %d begin:",t);
-		show();
-		for(int a = 0;a < PM;a++){
-			if(buffer[a] == 0){
-				buffer[a] = rand()%10+1;
-				sem_post(&prdn);
-				break;
-			}
-		}
-		printf("PBend:     ");
-		show();
-		sleep(1);
-		if(t == PM-1){
-			printf("PB EXIT\n");
-		}
-		printf("\n");
-		sem_post(&mutex);
-		//sem_post(&prdn);
-		t++;
-	}
-	pthread_exit(NULL);
 
-}
 
-void Cproducer(void* args){
-	int t = 1;
-	while(t <= PM-1){	
-		sem_wait(&empty);
-		sem_wait(&mutex);
-		printf("PCid:%u\n",(unsigned int)pthread_self());
-		printf("PC %d begin:",t);
-		show();
-		for(int a = 0;a < PM;a++){
-			if(buffer[a] == 0){
-				buffer[a] = rand()%10+1;
-				sem_post(&prdn);
-				break;
-			}
-		}
-		printf("PCend:     ");
-		show();
-		sleep(1);
-		if(t == PM-1){
-			printf("PC EXIT\n");
-		}
-		printf("\n");
-		sem_post(&mutex);
-		//sem_post(&prdn);
-		t++;
-	}
-	pthread_exit(NULL);
-}
-
-void consumerA(void* args){
+void consumer(void* args){
 	int t = 1,a;
 	while(t <= CM){
 		sem_wait(&prdn);
 		sem_wait(&mutex);
 
-		printf("CAid:%u\n",(unsigned int)pthread_self());
-		printf("Ca %d begin:",t);
+		printf("%sid:%u\n",((my_args*)args) ->na,(unsigned int)pthread_self());
+		printf("%s %d begin:",((my_args*)args) ->na,t);
 		show();
 
 		for(a = 0;a < PM;a++){
-			if(buffer[a]%2 == 1){
+			if((buffer[a]%2 == ((my_args*)args) ->jo) && (buffer[a] != 0)){
 				buffer[a] = 0;
 				sem_post(&empty);
 				break;
@@ -129,11 +76,11 @@ void consumerA(void* args){
 		}
 		if(a == PM)
 			sem_post(&prdn);
-		printf("Ca end:    ");
+		printf("%s end:    ",((my_args*)args) ->na);
 		show();
 		sleep(1);
 		if(t == CM)
-			printf("Ca EXIT\n");
+			printf("%s EXIT\n",((my_args*)args) ->na);
 		printf("\n");
 		//sem_post(&mutex);
 		//if(a < PM)
@@ -144,38 +91,6 @@ void consumerA(void* args){
 	pthread_exit(NULL);
 
 }
-
-void consumerB(void* args){
-	int t = 1,a;
-	while(t <= CM){
-		sem_wait(&prdn);
-		sem_wait(&mutex);
-
-		printf("CBid:%u\n",(unsigned int)pthread_self());
-		printf("Cb %d begin:",t);
-		show();
-
-		for(a = 0;a < PM;a++){
-			if((buffer[a]%2 == 0) && (buffer[a] != 0)){
-				buffer[a] = 0;
-				sem_post(&empty);
-				break;
-			}
-		}
-		if(a == PM)
-			sem_post(&prdn);
-		printf("Cb end:    ");
-		show();
-		sleep(1);
-		if(t == CM)
-			printf("Cb EXIT\n");
-		printf("\n");
-		sem_post(&mutex);
-		t++;
-	}
-	pthread_exit(NULL);
-}
-
 
 int main()
 {
@@ -199,12 +114,18 @@ int main()
 		printf("prdn_init error\n");
 		return 0;
 	}
+	
+	my_args thpa = {"PA",0};	
+	my_args thpb = {"PB",0};
+	my_args thpc = {"PC",0};
+	my_args thca = {"CA",1};
+	my_args thcb = {"CB",0};
 
-	pthread_create(&pa,NULL,(void*)&Aproducer,NULL);
-	pthread_create(&pb,NULL,(void*)&Bproducer,NULL);
-	pthread_create(&pc,NULL,(void*)&Cproducer,NULL);
-	pthread_create(&ca,NULL,(void*)&consumerA,NULL);
-	pthread_create(&cb,NULL,(void*)&consumerB,NULL);
+	pthread_create(&pa,NULL,(void*)&producer,&thpa);
+	pthread_create(&pb,NULL,(void*)&producer,&thpb);
+	pthread_create(&pc,NULL,(void*)&producer,&thpc);
+	pthread_create(&ca,NULL,(void*)&consumer,&thca);
+	pthread_create(&cb,NULL,(void*)&consumer,&thcb);
 
 	pthread_join(pa,NULL);
 	pthread_join(pb,NULL);
@@ -218,5 +139,3 @@ int main()
 
 	return 0;
 }
-
-
