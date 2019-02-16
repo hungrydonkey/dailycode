@@ -133,5 +133,7 @@ int main()
 	sem_destroy(&empty);
 	sem_destroy(&prdn);
 
+	free(buffer);
 	return 0;
 }
+
