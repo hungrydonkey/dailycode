@@ -18,7 +18,7 @@ sem_t mutex;//buffer mutex
 sem_t prdn;// production
 sem_t empty;//judge buffer  
 
-void show(){
+void show(void){
 	for(int i = 0;i < PM;i++)
 		printf("%d ",buffer[i]);
 	printf("\n");
