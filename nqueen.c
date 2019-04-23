@@ -31,7 +31,7 @@ static void findindex(int n,int *a,int row){
         }
 }
 
-int main(){
+int main(void){
     int n;
     puts("print n:");
     scanf("%d",&n);
