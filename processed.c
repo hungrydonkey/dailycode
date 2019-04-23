@@ -88,7 +88,7 @@ void consumer(void* args){
 	pthread_exit(NULL);
 }
 
-int main()
+int main(void)
 {
 	pthread_t pa,pb,pc; //producer
 	pthread_t ca,cb;    //consumer
