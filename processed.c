@@ -94,7 +94,7 @@ int main(void)
 	pthread_t ca,cb;    //consumer
 	srand((int)time(NULL));
 	
-	buffer = (int*)malloc(sizeof(int)*PM);
+	buffer = malloc(sizeof(int)*PM);
 	memset(buffer,0,PM);
 	if(sem_init(&mutex,0,1) != 0){
 		printf("mutex_init error\n");
