@@ -63,7 +63,7 @@ void inedge(Graph * G,int v1,int v2,int n){
 		printf("cross the edge!");
 		return	;
 	}
-	p = (edge*)malloc(sizeof(edge)) ;
+	p = malloc(sizeof(edge)) ;
 	p ->dest = v2;
 	p ->cost = n;
 	p ->next = G ->a[v1].link;
@@ -124,7 +124,7 @@ void dijk(int x ,Graph *o){
 
     //initialize D(x)
 	for(int i = 0;i < 6;i++ ){
-        z = (list*)malloc(sizeof(list)) ;
+        z = malloc(sizeof(list)) ;
 		z ->data.qid = x;
 		z  ->data.zod = o ->a[i].data ;
 		z ->data.quan = infi;
@@ -154,7 +154,7 @@ void dijk(int x ,Graph *o){
         }
 
         //add r to nx1
-        z = (list*)malloc(sizeof(list)) ;
+        z = malloc(sizeof(list)) ;
         z ->data.qid  = r ->data.qid;
         z ->data.zod  = r ->data.zod;
         z ->data.quan = r ->data.quan;
