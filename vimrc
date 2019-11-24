@@ -9,21 +9,29 @@ set wildmenu
 set incsearch
 set hlsearch
 set scrolloff=10
+
 map W :w<CR>
 map Q :q<CR>
 map qc :q!<CR>
 map qs :wq<CR>
+map te :terminal<CR>
 nnoremap s <NOP>
 
 
 map tt :NERDTreeToggle<CR>
-inoremap jj <Esc>`^
+nmap <silent> <C-j> <Plug>(ale_previous_wrap)
+nmap <silent> <C-k> <Plug>(ale_next_wrap)
+inoremap jj <Esc>
+vnoremap jj <Esc> 
 
 
 let g:indentLine_char = '┊'
 let g:ale_lint_on_text_changed = 'always'
-
-
+let g:ale_c_clang_options = '-std=c17 -Wall'
+let g:ale_linters = {
+\   'c'   : ['clang'],
+\	'cpp' : ['clang','clangtidy'],
+\}
 
 call plug#begin()
 
