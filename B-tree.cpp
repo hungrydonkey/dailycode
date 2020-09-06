@@ -26,44 +26,44 @@ typedef struct{
     int _findit;
 }Dest;
 
-Dest *findtree(BTNode *tree,int a)
+Dest findtree(BTNode *tree,int a)
 {
     int  i ;
-    Dest *p = NULL;
+    Dest p = {0,NULL,0};
 
     if(tree != NULL){
         for(i = 0; i < tree->coun ;i++){
             if(a == tree ->key[i].num){
-                p = new Dest;
-                p ->inpoint = i;
-                p ->pono = tree;
-                p ->_findit = 1;
+                //p = new Dest;
+                p.inpoint = i;
+                p.pono = tree;
+                p._findit = 1;
                 cout <<"find it"<<endl;
                 //p ->_findit = 1;
                 return p;
             }
             else if(a < tree ->key[i].num){
-                    if(tree ->child[i] != NULL){
-                        p = findtree(tree ->child[i],a);
-                        break;
-                    }
-                    else{
-                        p = new Dest;
-                        p ->pono = tree;
-                        p ->inpoint = i;
-                        p ->_findit = 0;
-                        return p;
-                    }
-                }
+                        if(tree ->child[i] != NULL){
+                            p = findtree(tree ->child[i],a);
+                            break;
+                        }
+                        else{
+                            //p = new Dest;
+                            p.pono = tree;
+                            p.inpoint = i;
+                            p._findit = 0;
+                            return p;
+                        }
+                 }
         }
         if(i == tree ->coun){
             if(tree ->child[i] != NULL)
                 p = findtree(tree ->child[i],a);
             else{
-                p = new Dest;
-                p ->inpoint = i;
-                p ->pono = tree;
-                p ->_findit = 0;
+                //p = new Dest;
+                p.inpoint = i;
+                p.pono = tree;
+                p._findit = 0;
             }
         }
     }
@@ -189,7 +189,8 @@ void show(BTNode *p,int n)
 int insertbtree(BTNode **tree,book a)
 {
     BTNode *p;
-    Dest *w;
+    //Dest *w;
+    Dest w;
     if(*tree == NULL){
         p = new BTNode;
         if(NULL == p)
@@ -203,143 +204,142 @@ int insertbtree(BTNode **tree,book a)
         return 0;
     }
     else{
-        w = findtree(*tree,a.num);
-        if(w ->_findit == 1 ){
-            cout << "This book has been existed."<<endl<<endl;
-            return -1;
+            w = findtree(*tree,a.num);
+            if(w._findit == 1){
+                cout << "This book has been existed."<<endl<<endl;
+                return -1;
+            }
+            w.pono ->coun++;
+            for(int i = w.pono ->coun; i > w.inpoint; i--){
+                if(i < w.pono ->coun)
+                    w.pono ->key[i] = w.pono ->key[i-1];
+                    w.pono ->child[i] = w.pono ->child[i-1];
+            }
+            w.pono ->key[w.inpoint] = a;
+            w.pono ->child[w.inpoint] = NULL;
+            //for(int i = 0;i < 4;i++)
+            if(w.pono ->coun == M)
+                splittree(w.pono);
         }
-        w ->pono ->coun++;
-        for(int i = w ->pono ->coun; i > w ->inpoint; i--){
-            if(i < w ->pono ->coun)
-                w ->pono ->key[i] = w ->pono ->key[i-1];
-            w ->pono ->child[i] = w ->pono ->child[i-1];
-        }
-        w ->pono ->key[w ->inpoint] = a;
-        w ->pono ->child[w ->inpoint] = NULL;
-        //for(int i = 0;i < 4;i++)
-        if(w ->pono ->coun == M)
-            splittree(w ->pono);
-    }
-    delete w;
     return 0;
 }
 
-void borroewBTtree(Dest *w){
+void borroewBTtree(Dest w){
     int i;
     //Dest *w = p;
-    for(i = 0;i <= w ->pono ->prt ->coun;i++){
-        if(w ->pono ->prt ->child[i] == w ->pono)
+    for(i = 0;i <= w.pono ->prt ->coun;i++){
+        if(w.pono ->prt ->child[i] == w.pono)
             break;
     }
-    if(i == w ->pono ->prt ->coun){
-        if(w ->pono ->prt ->child[i-1]->coun > M/2-1){
-            w ->pono ->key[0] = w ->pono ->prt ->key[i-1];
-            w ->pono ->coun ++;
-            w ->pono ->prt ->key[i-1] = w ->pono ->prt ->child[i-1]->key[w ->pono ->prt ->child[i-1] ->coun-1];
-            if(w ->pono ->prt ->child[i-1]->child[w ->pono ->prt ->child[i-1] ->coun] != NULL && w ->pono ->child[0] != NULL){
-                if(w ->pono ->prt ->child[i-1]->child[w ->pono ->prt ->child[i-1] ->coun] ->key[0].num < w ->pono ->child[0] ->key[0].num){
-                    w ->pono ->child[1] = w ->pono ->child[0];
-                    w ->pono ->child[0] = w ->pono ->prt ->child[i-1]->child[w ->pono ->prt ->child[i-1] ->coun];
-                    w ->pono ->child[0] ->prt = w ->pono;
+    if(i == w.pono ->prt ->coun){
+        if(w.pono ->prt ->child[i-1]->coun > M/2-1){
+            w.pono ->key[0] = w.pono ->prt ->key[i-1];
+            w.pono ->coun ++;
+            w.pono ->prt ->key[i-1] = w.pono ->prt ->child[i-1]->key[w.pono ->prt ->child[i-1] ->coun-1];
+            if(w.pono ->prt ->child[i-1]->child[w.pono ->prt ->child[i-1] ->coun] != NULL && w.pono ->child[0] != NULL){
+                if(w.pono ->prt ->child[i-1]->child[w.pono ->prt ->child[i-1] ->coun] ->key[0].num < w.pono ->child[0] ->key[0].num){
+                    w.pono ->child[1] = w.pono ->child[0];
+                    w.pono ->child[0] = w.pono ->prt ->child[i-1]->child[w.pono ->prt ->child[i-1] ->coun];
+                    w.pono ->child[0] ->prt = w.pono;
                 }
                 else
-                    w ->pono ->child[1] = w ->pono ->prt ->child[i-1]->child[w ->pono ->prt ->child[i-1] ->coun];
+                    w.pono ->child[1] = w.pono ->prt ->child[i-1]->child[w.pono ->prt ->child[i-1] ->coun];
             }
             else
-                w ->pono ->child[w ->pono ->coun-1] = w ->pono ->prt ->child[i-1]->child[w ->pono ->prt ->child[i-1] ->coun];
-            w ->pono ->prt ->child[i-1] ->coun--;
+                w.pono ->child[w.pono ->coun-1] = w.pono ->prt ->child[i-1]->child[w.pono ->prt ->child[i-1] ->coun];
+            w.pono ->prt ->child[i-1] ->coun--;
         }
-        else if(w ->pono ->prt ->child[i-1]->coun == M/2-1){
-                if(w ->pono ->prt ->prt == NULL && w ->pono ->prt ->coun == 1){
+        else if(w.pono ->prt ->child[i-1]->coun == M/2-1){
+                if(w.pono ->prt ->prt == NULL && w.pono ->prt ->coun == 1){
                     BTNode *b;
-                    w ->pono ->prt ->coun = w ->pono ->prt ->coun + w ->pono ->prt ->child[0] ->coun;
-                    w ->pono ->prt ->key[w ->pono ->prt ->coun-1] = w ->pono ->prt ->key[0];
-                    b = w ->pono ->prt ->child[0];
+                    w.pono ->prt ->coun = w.pono ->prt ->coun + w.pono ->prt ->child[0] ->coun;
+                    w.pono ->prt ->key[w.pono ->prt ->coun-1] = w.pono ->prt ->key[0];
+                    b = w.pono ->prt ->child[0];
                     for(int i = 0;i < b ->coun;i++){
-                        w ->pono ->prt ->key[i] = b ->key[i];
-                        w ->pono ->prt ->child[i] = b ->child[i];
-                        if(w ->pono ->prt ->child[i] != NULL)
-                            w ->pono ->prt ->child[i] ->prt = w ->pono ->prt;
+                        w.pono ->prt ->key[i] = b ->key[i];
+                        w.pono ->prt ->child[i] = b ->child[i];
+                        if(w.pono ->prt ->child[i] != NULL)
+                            w.pono ->prt ->child[i] ->prt = w.pono ->prt;
                     }
-                    w ->pono ->prt ->child[b ->coun] = b ->child[b ->coun];
-                    if(w ->pono ->prt ->child[b ->coun] != NULL)
-                        w ->pono ->prt ->child[b ->coun] ->prt = w ->pono ->prt;
-                    w ->pono ->prt ->child[w ->pono ->prt ->coun] = w ->pono ->child[0];
-                    if(w ->pono ->prt ->child[w ->pono ->prt ->coun] != 0)
-                        w ->pono ->prt ->child[w ->pono ->prt ->coun] ->prt = w ->pono ->prt ;
+                    w.pono ->prt ->child[b ->coun] = b ->child[b ->coun];
+                    if(w.pono ->prt ->child[b ->coun] != NULL)
+                        w.pono ->prt ->child[b ->coun] ->prt = w.pono ->prt;
+                    w.pono ->prt ->child[w.pono ->prt ->coun] = w.pono ->child[0];
+                    if(w.pono ->prt ->child[w.pono ->prt ->coun] != 0)
+                        w.pono ->prt ->child[w.pono ->prt ->coun] ->prt = w.pono ->prt ;
                 }
             else{
-                w ->pono ->prt ->child[i-1]->key[M/2-1] = w ->pono ->prt ->key[w ->pono ->prt ->coun -1];
-                w ->pono ->prt ->child[i-1]->coun ++;
-                w ->pono ->prt ->child[i-1]->child[w ->pono ->prt ->child[i-1]->coun] = w ->pono ->child[0];
-                if(w ->pono ->prt ->child[i-1]->child[w ->pono ->prt ->child[i-1]->coun] != NULL)
-                w ->pono ->prt ->child[i-1]->child[w ->pono ->prt ->child[i-1]->coun] ->prt = w ->pono ->prt ->child[i-1];
-                w ->pono ->prt ->coun --;
-                if(w ->pono ->prt ->coun == 0){
-                    Dest *l = new Dest;
-                    l ->pono = w ->pono ->prt;
-                    l ->inpoint = w ->pono ->coun;
+                w.pono ->prt ->child[i-1]->key[M/2-1] = w.pono ->prt ->key[w.pono ->prt ->coun -1];
+                w.pono ->prt ->child[i-1]->coun ++;
+                w.pono ->prt ->child[i-1]->child[w.pono ->prt ->child[i-1]->coun] = w.pono ->child[0];
+                if(w.pono ->prt ->child[i-1]->child[w.pono ->prt ->child[i-1]->coun] != NULL)
+                w.pono ->prt ->child[i-1]->child[w.pono ->prt ->child[i-1]->coun] ->prt = w.pono ->prt ->child[i-1];
+                w.pono ->prt ->coun --;
+                if(w.pono ->prt ->coun == 0){
+                    Dest l;
+                    l.pono = w.pono ->prt;
+                    l.inpoint = w.pono ->coun;
                     borroewBTtree(l);
                 }
             }
         }
     }
     else {
-            if(w ->pono ->prt ->child[i+1]->coun > M/2-1){
-                w ->pono ->key[0] = w ->pono ->prt ->key[i];
-                w ->pono ->coun ++;
-                w ->pono ->prt ->key[i] = w ->pono ->prt ->child[i+1] ->key[0];
-                w ->pono ->child[w ->pono ->coun] = w ->pono ->prt ->child[i+1] ->child[0];
-                if(w ->pono ->child[w ->pono ->coun] != 0)
-                    w ->pono ->child[w ->pono ->coun] ->prt = w ->pono;
-                w ->pono ->prt ->child[i+1]->coun--;
-                for(int a = 0;a < w ->pono ->prt ->child[i+1]->coun;a++){
-                    w ->pono ->prt ->child[i+1] ->key[a]   = w ->pono ->prt ->child[i+1]->key[a+1];
-                    w ->pono ->prt ->child[i+1] ->child[a] = w ->pono ->prt ->child[i+1] ->child[a+1];
+            if(w.pono ->prt ->child[i+1]->coun > M/2-1){
+                w.pono ->key[0] = w.pono ->prt ->key[i];
+                w.pono ->coun ++;
+                w.pono ->prt ->key[i] = w.pono ->prt ->child[i+1] ->key[0];
+                w.pono ->child[w.pono ->coun] = w.pono ->prt ->child[i+1] ->child[0];
+                if(w.pono ->child[w.pono ->coun] != 0)
+                    w.pono ->child[w.pono ->coun] ->prt = w.pono;
+                w.pono ->prt ->child[i+1]->coun--;
+                for(int a = 0;a < w.pono ->prt ->child[i+1]->coun;a++){
+                    w.pono ->prt ->child[i+1] ->key[a]   = w.pono ->prt ->child[i+1]->key[a+1];
+                    w.pono ->prt ->child[i+1] ->child[a] = w.pono ->prt ->child[i+1] ->child[a+1];
                 }
-                w ->pono ->prt ->child[i+1] ->child[w ->pono ->prt ->child[i+1] ->coun] = w ->pono ->prt ->child[i+1] ->child[w ->pono ->prt ->child[i+1] ->coun+1];
+                w.pono ->prt ->child[i+1] ->child[w.pono ->prt ->child[i+1] ->coun] = w.pono ->prt ->child[i+1] ->child[w.pono ->prt ->child[i+1] ->coun+1];
             }
             else
-                if(w ->pono ->prt ->child[i+1]->coun == M/2-1){
-                    cout << w ->pono ->key[w ->inpoint].num <<"  "<< w ->pono ->prt ->key[0].num  <<endl;//---------test
-                    if(w ->pono ->prt ->prt == NULL && w ->pono ->prt ->coun == 1){
+                if(w.pono ->prt ->child[i+1]->coun == M/2-1){
+                    cout << w.pono ->key[w.inpoint].num <<"  "<< w.pono ->prt ->key[0].num  <<endl;//---------test
+                    if(w.pono ->prt ->prt == NULL && w.pono ->prt ->coun == 1){
                         BTNode *b;
-                        w ->pono ->prt ->coun = w ->pono ->prt ->coun + w ->pono ->prt ->child[1] ->coun;
-                        b = w ->pono ->prt ->child[1];
+                        w.pono ->prt ->coun = w.pono ->prt ->coun + w.pono ->prt ->child[1] ->coun;
+                        b = w.pono ->prt ->child[1];
                         for(int a = 1;a < b ->coun+1;a++){
-                            w ->pono ->prt ->key[a] = b ->key[a-1];
-                            w ->pono ->prt ->child[a] = b ->child[a-1];
-                            if(w ->pono ->prt ->child[a] != NULL)
-                                w ->pono ->prt ->child[a] ->prt = w ->pono ->prt;
+                            w.pono ->prt ->key[a] = b ->key[a-1];
+                            w.pono ->prt ->child[a] = b ->child[a-1];
+                            if(w.pono ->prt ->child[a] != NULL)
+                                w.pono ->prt ->child[a] ->prt = w.pono ->prt;
                         }
-                        w ->pono ->prt ->child[w ->pono ->prt ->coun] = b ->child[b ->coun];
-                        if(w ->pono ->prt ->child[w ->pono ->prt ->coun] != NULL)
-                            w ->pono ->prt ->child[w ->pono ->prt ->coun] ->prt = w ->pono ->prt;
-                        w ->pono ->prt ->child[0] = w ->pono ->child[0];
-                        if(w ->pono ->prt ->child[0] != NULL)
-                            w ->pono ->prt ->child[0] ->prt = w ->pono ->prt;
+                        w.pono ->prt ->child[w.pono ->prt ->coun] = b ->child[b ->coun];
+                        if(w.pono ->prt ->child[w.pono ->prt ->coun] != NULL)
+                            w.pono ->prt ->child[w.pono ->prt ->coun] ->prt = w.pono ->prt;
+                        w.pono ->prt ->child[0] = w.pono ->child[0];
+                        if(w.pono ->prt ->child[0] != NULL)
+                            w.pono ->prt ->child[0] ->prt = w.pono ->prt;
                     }
                     else{
-                        w ->pono ->key[0] = w ->pono ->prt ->key[i] ;
-                        w ->pono ->coun ++;
-                        w ->pono ->key[w ->pono ->coun] = w ->pono ->prt ->child[i+1] ->key[w ->pono ->prt ->child[i+1] ->coun-1];
-                        w ->pono ->coun ++;
-                        w ->pono ->child[w ->pono ->coun-1] = w ->pono ->prt ->child[i+1] ->child[0];
-                        w ->pono ->child[w ->pono ->coun] = w ->pono ->prt ->child[i+1] ->child[1];
-                        if(w ->pono ->child[w ->pono ->coun] != NULL){
-                            w ->pono ->child[w ->pono ->coun] ->prt = w ->pono;
-                            w ->pono ->child[w ->pono ->coun-1] ->prt = w ->pono;
+                        w.pono ->key[0] = w.pono ->prt ->key[i] ;
+                        w.pono ->coun ++;
+                        w.pono ->key[w.pono ->coun] = w.pono ->prt ->child[i+1] ->key[w.pono ->prt ->child[i+1] ->coun-1];
+                        w.pono ->coun ++;
+                        w.pono ->child[w.pono ->coun-1] = w.pono ->prt ->child[i+1] ->child[0];
+                        w.pono ->child[w.pono ->coun] = w.pono ->prt ->child[i+1] ->child[1];
+                        if(w.pono ->child[w.pono ->coun] != NULL){
+                            w.pono ->child[w.pono ->coun] ->prt = w.pono;
+                            w.pono ->child[w.pono ->coun-1] ->prt = w.pono;
                         }
                         //cout <<i<<endl;
-                        for(int a = i;a < w ->pono ->prt ->coun-1;a++){
-                            w ->pono ->prt ->key[a]     = w ->pono ->prt ->key[a+1];
-                            w ->pono ->prt ->child[a+1] = w ->pono ->prt ->child[a+2];
+                        for(int a = i;a < w.pono ->prt ->coun-1;a++){
+                            w.pono ->prt ->key[a]     = w.pono ->prt ->key[a+1];
+                            w.pono ->prt ->child[a+1] = w.pono ->prt ->child[a+2];
                         }
-                        w ->pono ->prt ->coun --;
-                        if(w ->pono ->prt ->coun == 0){
-                            Dest *l = new Dest;
-                            l ->pono = w ->pono ->prt;
-                            l ->inpoint = w ->pono ->prt ->coun;
+                        w.pono ->prt ->coun --;
+                        if(w.pono ->prt ->coun == 0){
+                            Dest l ;
+                            l.pono = w.pono ->prt;
+                            l.inpoint = w.pono ->prt ->coun;
                             borroewBTtree(l);
                         }
                     }
@@ -351,57 +351,58 @@ void borroewBTtree(Dest *w){
 int deleteBTtree(BTNode *tree,int a)
 {
     BTNode *p;
-    Dest *w;
+    Dest w;
     if(tree == NULL){
         cout <<"EMPTY!"<<endl<<endl;
         return -1;
     }
     w = findtree(tree ,a);
-    if(w ->_findit == 0){
+    if(w._findit == 0){
         cout << "This book dose not exist."<<endl <<endl;
         return -1;
     }
-    if(w ->pono ->child[0] == NULL){
-        if(w ->pono ->prt == NULL&&w ->pono ->coun > 0){
-            for(int i = w ->inpoint;i < w ->pono ->coun-1;i++)
-                w ->pono ->key[i] = w ->pono ->key[i+1];
-            w ->pono ->coun--;
+    if(w.pono ->child[0] == NULL){
+        if(w.pono ->prt == NULL&&w.pono ->coun > 0){
+            for(int i = w.inpoint;i < w.pono ->coun-1;i++)
+                w.pono ->key[i] = w.pono ->key[i+1];
+            w.pono ->coun--;
             cout <<"success"<<endl<<endl;
             return 0;
         }
-        for(int i = w ->inpoint;i < w ->pono ->coun-1;i++)
-            w ->pono ->key[i] = w ->pono ->key[i+1];
-        w ->pono ->coun--;
-        if(w ->pono ->coun == 0)
+        for(int i = w.inpoint;i < w.pono ->coun-1;i++)
+            w.pono ->key[i] = w.pono ->key[i+1];
+        w.pono ->coun--;
+        if(w.pono ->coun == 0)
             borroewBTtree(w);
     }
     else {
-        p = w ->pono ->child[w ->inpoint+1];
+        p = w.pono ->child[w.inpoint+1];
         while(1){
             if(p ->child[0] == NULL)
                 break;
             p = p ->child[0];
         }
         cout<<p ->key[0].num<<endl;//---------------
-        w ->pono ->key[w ->inpoint] = p ->key[0];
+        w.pono ->key[w.inpoint] = p ->key[0];
        for(int i = 0;i < p ->coun-1;i++){
             p ->key[i] = p ->key[i+1];
         }
         p ->coun --;
         if(p ->coun == 0){
-            Dest *l = new Dest;
-            l ->inpoint = 0;
-            l ->pono = p;
+            Dest l;
+            l.inpoint = 0;
+            l.pono = p;
             borroewBTtree(l);
         }
     }
-    delete w;
+    //delete w;
     return 0;
 }
 
 void Borrow(BTNode *tree)
 {
-    Dest *w;
+    //Dest *w;
+    Dest w;
     int n = 0,a;
     if(tree == NULL){
         cout <<"EMPTY!"<<endl<<endl;
@@ -410,13 +411,13 @@ void Borrow(BTNode *tree)
     cout <<"print the number of the book:"<<endl;
     cin >>a;
     w = findtree(tree,a);
-    if(w ->_findit == 1){
-        cout << w ->pono ->key[w ->inpoint].name<<" "<<w ->pono ->key[w ->inpoint].auth<<"  "<<w ->pono ->key[w ->inpoint].current<<"   "<<w ->pono ->key[w ->inpoint].total<<endl;
-        if(w ->pono ->key[w ->inpoint].current > 0){
+    if(w._findit == 1){
+        cout << w.pono ->key[w.inpoint].name<<" "<<w.pono ->key[w.inpoint].auth<<"  "<<w.pono ->key[w.inpoint].current<<"   "<<w.pono ->key[w.inpoint].total<<endl;
+        if(w.pono ->key[w.inpoint].current > 0){
             cout <<"Are you sure borrow this book? 1.ture 2.cancel"<<endl;
             cin >>n;
             if(n == 1){
-                w ->pono ->key[w ->inpoint].current--;
+                w.pono ->key[w.inpoint].current--;
                 cout <<"success"<<endl<<endl;
                 return;
             }
@@ -427,13 +428,12 @@ void Borrow(BTNode *tree)
     }
     else
         cout <<"This book dose not exist."<<endl<<endl;
-    delete w;
-
+    //delete w;
 }
 
 void revert(BTNode *tree)
 {
-    Dest *w;
+    Dest w;
     int a;
     if(tree == NULL){
         cout <<"EMPTY!"<<endl<<endl;
@@ -442,16 +442,16 @@ void revert(BTNode *tree)
     cout <<"print the number of the book:"<<endl;
     cin >>a;
     w = findtree(tree,a);
-    if(w ->_findit == 1){
-        if(w ->pono ->key[w ->inpoint].current < w ->pono ->key[w ->inpoint].total){
-            w ->pono ->key[w ->inpoint].current++;
+    if(w._findit == 1){
+        if(w.pono ->key[w.inpoint].current < w.pono ->key[w.inpoint].total){
+            w.pono ->key[w.inpoint].current++;
             cout <<"success"<<endl<<endl;
         }
         else cout <<"This book has not yet been borrowed!"<<endl<<endl;
     }
     else
         cout <<"This book dose not exist."<<endl<<endl;
-    delete w;
+    //delete w;
 }
 
 
@@ -492,4 +492,3 @@ int main(void)
     }
     return 0;
 }
-                    
