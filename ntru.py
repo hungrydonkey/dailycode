@@ -3,8 +3,8 @@ from sympy.abc import x
 from numpy import random 
 import numpy 
 import math
-N = 443#107,167,503
-d = 143
+N = 79#107,167,503
+d = 6
 p = 3
 q = 43
 R = x**N - 1
@@ -92,6 +92,8 @@ def genpk(fx_1q, gx, q):
 
 def encrypt(hx, m, p, q):
     rx = randompoly(N, d, d)
+    print("rx is ",rx)
+    print(rx.all_coeffs())
     ex = p * hx * rx + m 
     s, ex = div(ex, R, domain=GF(q))
     return ex
@@ -129,6 +131,35 @@ def detect1(p, q, c, m):
     z_1 = z.eval(1)
     print("z(1) is ", z_1)
     return z_1
+
+def detect2(p, q, hx, c, m):
+    print(c)
+    print(m)
+    φ1  = Poly(x - 1)
+    φ2  = div(R, φ1)[0]
+    inverse_p = mod_inverse(p, q)
+    w   =  ( c - m ) * inverse_p
+    w   =  w.set_modulus(q)
+    print(w, w.eval(1))
+    s, w   =  div(w, φ2, domain=GF(q))
+    print(w)
+    try:
+        inverse_hx_inφ2 = invert_poly(hx, φ2, q)
+    except NotInvertible:
+        raise Exception("Couldn't generate invertible hx in φ2")
+    print("inverse of hx is ", inverse_hx_inφ2)
+    print(div(inverse_hx_inφ2 * hx, φ2, domain=GF(q))[1])
+
+    w_φ1    = 0
+    s, w_φ2 = div(w * inverse_hx_inφ2, φ2, domain=GF(q))
+    print(w_φ2)
+    
+    inverse_φ1  =  invert(φ1, φ2, domain=GF(q))
+    print("inverse_φ1 is ", inverse_φ1)
+    s, w    = div(w_φ2 * inverse_φ1, φ2, domain=GF(q))
+    s, w    = div(φ1 *  w, R, domain=GF(q))
+    print(w)
+    return None
 
 def ntru():
     #hx = genpk(fx_1q, gx, q)
@@ -181,7 +212,7 @@ def bdntru(ex):
 
 def initial():
     p     = 3#0
-    q     = 2048#0
+    q     = 128#0
     fx    = None
     gx    = None
     fx_1q = None
@@ -201,7 +232,7 @@ def initial():
     return p, q, fx, gx, fx_1p, fx_1q, hx
 
 def p_hx():
-    test       = 3
+    test       = 50
     invertible = 0
     φ1         = Poly(x - 1)
     φ2         = div(R, φ1)[0]
@@ -211,18 +242,20 @@ def p_hx():
         p, q, fx, gx, fx_1p, fx_1q, hx = initial()
         try:
             hx_1 = invert_poly(hx, φ2, q)
+            #hx_1mod2 = invert(hx, φ2, domain=GF(2))
         except NotInvertible :
             invertible = invertible - 1
     print("hx is invertable is ", invertible / test)            
     #get the P is approximately 59% that hx is invertible in φ2
 
-m = Poly(list(map(int, list("111010101101011010110110011"))),x)
+m = Poly(list(map(int, list("101011"))),x)
 print(m, m.eval(1))
 #normal and bd NTRU
 p, q, fx, gx, fx_1p, fx_1q, hx = initial()
 c_normal = ntru()
-#c_bd     = bdntru(c_normal)
-
+c_bd     = bdntru(c_normal)
+detect2(p, q, hx, c_normal, m)
+#detect1(p, q, c_bd, m)
 #p_hx()
 '''
 t1   = 0
