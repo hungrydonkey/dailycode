@@ -1,6 +1,6 @@
 set number
 set tabstop=4
-set autoindent
+set smartindent
 set softtabstop=4
 set shiftwidth=4
 set showcmd
@@ -18,7 +18,7 @@ map te :terminal<CR>
 nnoremap s <NOP>
 
 
-map tt :NERDTreeToggle<CR>
+"map tt :NERDTreeToggle<CR>
 nmap <silent> <C-j> <Plug>(ale_previous_wrap)
 nmap <silent> <C-k> <Plug>(ale_next_wrap)
 inoremap jj <Esc>
@@ -38,7 +38,7 @@ call plug#begin()
 Plug 'w0rp/ale'
 Plug 'vim-airline/vim-airline'
 Plug 'jiangmiao/auto-pairs'
-Plug 'scrooloose/nerdtree'
+"Plug 'scrooloose/nerdtree'
 Plug 'yggdroot/indentline'
 
 
@@ -55,7 +55,10 @@ set completeopt=noinsert,menuone,noselect
 inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <silent> <expr> <CR> ncm2_neosnippet#expand_or("\<CR>", 'n')
+"inoremap <silent> <expr> <CR> ncm2_neosnippet#expand_or("\<CR>", 'n')
+
+inoremap <silent> <expr> <CR> ((pumvisible() && empty(v:completed_item)) ?  "\<c-y>\<cr>" : (!empty(v:completed_item) ? ncm2_neosnippet#expand_or("\<CR>", 'n') : "\<CR>" ))
+
 
 imap <expr><TAB>  pumvisible() ? "\<C-n>" : neosnippet#expandable_or_jumpable() ? "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 
@@ -64,22 +67,21 @@ if has('conceal')
 endif
 
 "pyclang
-let g:ncm2_pyclang#library_path         =  '/usr/lib/libclang.so.8'
+"let g:ncm2_pyclang#library_path         =  '/usr/lib/libclang.so.8'
+
 "highlight
 let g:ncm2#match_highlight = 'bold'
-let g:neosnippet#enable_snipmate_compatibility = 1
-let g:neosnippet#snippets_directory='~/.config/nvim/plugged/vim-snippets/snippets'
-let g:neosnippet#disable_runtime_snippets = {
-		\   '_' : 1,
-		\ }
-"let g:ncm2_jedi#python_version = 3
+
+"let g:neosnippet#snippets_directory='~/.config/nvim/plugged/vim-snippets/snippets'
+"let g:neosnippet#disable_runtime_snippets = {
+"		\   '_' : 1,
+"		\ }
+
 
 
 
 Plug 'ncm2/ncm2-bufword'
 Plug 'ncm2/ncm2-path'
-"Plug 'ncm2/ncm2-ultisnips'
-"Plug 'SirVer/ultisnips'
 Plug 'Shougo/neosnippet.vim'
 Plug 'ncm2/ncm2-neosnippet'
 Plug 'ncm2/ncm2-pyclang'
