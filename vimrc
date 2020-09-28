@@ -27,10 +27,11 @@ vnoremap jj <Esc>
 
 let g:indentLine_char = '┊'
 let g:ale_lint_on_text_changed = 'always'
-let g:ale_c_clang_options = '-std=c17 -Wall'
+let g:ale_c_cc_options = '-std=c17 -Wall'
+let g:ale_cpp_cc_options = '-std=c++17 -Wall'
 let g:ale_linters = {
-\   'c'   : ['clang'],
-\	'cpp' : ['clang','clangtidy'],
+\   'c'   : ['cc'],
+\	  'cpp' : ['cc','clangtidy'],
 \}
 
 call plug#begin()
