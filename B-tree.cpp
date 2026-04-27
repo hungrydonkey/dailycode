@@ -198,7 +198,7 @@ int insertbtree(BTNode **tree,book a)
         p ->coun = 1;
         p ->prt = NULL;
         p ->key[0] = a;
-        for(int i = 0 ;i < M ;i++)
+        for(int i = 0 ;i <= M ;i++)
            p ->child[i] = NULL;
         *tree = p;
         return 0;
@@ -209,11 +209,13 @@ int insertbtree(BTNode **tree,book a)
                 cout << "This book has been existed."<<endl<<endl;
                 return -1;
             }
+            // Shift right to make room; key and child arrays shift separately
+            // because key has M slots, child has M+1 slots
             w.pono ->coun++;
             for(int i = w.pono ->coun; i > w.inpoint; i--){
                 if(i < w.pono ->coun)
                     w.pono ->key[i] = w.pono ->key[i-1];
-                    w.pono ->child[i] = w.pono ->child[i-1];
+                w.pono ->child[i] = w.pono ->child[i-1];
             }
             w.pono ->key[w.inpoint] = a;
             w.pono ->child[w.inpoint] = NULL;
@@ -267,6 +269,8 @@ void borroewBTtree(Dest w){
                     w.pono ->prt ->child[w.pono ->prt ->coun] = w.pono ->child[0];
                     if(w.pono ->prt ->child[w.pono ->prt ->coun] != 0)
                         w.pono ->prt ->child[w.pono ->prt ->coun] ->prt = w.pono ->prt ;
+                    delete b;
+                    delete w.pono;
                 }
             else{
                 w.pono ->prt ->child[i-1]->key[M/2-1] = w.pono ->prt ->key[w.pono ->prt ->coun -1];
@@ -281,6 +285,7 @@ void borroewBTtree(Dest w){
                     l.inpoint = w.pono ->coun;
                     borroewBTtree(l);
                 }
+                delete w.pono;
             }
         }
     }
@@ -301,7 +306,6 @@ void borroewBTtree(Dest w){
             }
             else
                 if(w.pono ->prt ->child[i+1]->coun == M/2-1){
-                    cout << w.pono ->key[w.inpoint].num <<"  "<< w.pono ->prt ->key[0].num  <<endl;//---------test
                     if(w.pono ->prt ->prt == NULL && w.pono ->prt ->coun == 1){
                         BTNode *b;
                         w.pono ->prt ->coun = w.pono ->prt ->coun + w.pono ->prt ->child[1] ->coun;
@@ -318,20 +322,30 @@ void borroewBTtree(Dest w){
                         w.pono ->prt ->child[0] = w.pono ->child[0];
                         if(w.pono ->prt ->child[0] != NULL)
                             w.pono ->prt ->child[0] ->prt = w.pono ->prt;
+                        delete b;
+                        delete w.pono;
                     }
                     else{
-                        w.pono ->key[0] = w.pono ->prt ->key[i] ;
-                        w.pono ->coun ++;
-                        w.pono ->key[w.pono ->coun] = w.pono ->prt ->child[i+1] ->key[w.pono ->prt ->child[i+1] ->coun-1];
-                        w.pono ->coun ++;
-                        w.pono ->child[w.pono ->coun-1] = w.pono ->prt ->child[i+1] ->child[0];
-                        w.pono ->child[w.pono ->coun] = w.pono ->prt ->child[i+1] ->child[1];
-                        if(w.pono ->child[w.pono ->coun] != NULL){
-                            w.pono ->child[w.pono ->coun] ->prt = w.pono;
-                            w.pono ->child[w.pono ->coun-1] ->prt = w.pono;
+                        BTNode *rs = w.pono ->prt ->child[i+1];
+                        int rs_coun = rs ->coun;
+
+                        w.pono ->key[0] = w.pono ->prt ->key[i];
+                        w.pono ->coun = 1;
+
+                        for(int j = 0; j < rs_coun; j++){
+                            w.pono ->key[w.pono ->coun] = rs ->key[j];
+                            w.pono ->child[w.pono ->coun] = rs ->child[j];
+                            if(w.pono ->child[w.pono ->coun] != NULL)
+                                w.pono ->child[w.pono ->coun] ->prt = w.pono;
+                            w.pono ->coun++;
                         }
-                        //cout <<i<<endl;
-                        for(int a = i;a < w.pono ->prt ->coun-1;a++){
+                        w.pono ->child[w.pono ->coun] = rs ->child[rs_coun];
+                        if(w.pono ->child[w.pono ->coun] != NULL)
+                            w.pono ->child[w.pono ->coun] ->prt = w.pono;
+
+                        delete rs;
+
+                        for(int a = i; a < w.pono ->prt ->coun-1; a++){
                             w.pono ->prt ->key[a]     = w.pono ->prt ->key[a+1];
                             w.pono ->prt ->child[a+1] = w.pono ->prt ->child[a+2];
                         }
@@ -339,13 +353,21 @@ void borroewBTtree(Dest w){
                         if(w.pono ->prt ->coun == 0){
                             Dest l ;
                             l.pono = w.pono ->prt;
-                            l.inpoint = w.pono ->prt ->coun;
+                            l.inpoint = 0;
                             borroewBTtree(l);
                         }
                     }
                 }
     }
 
+}
+
+void destroytree(BTNode *tree)
+{
+    if(tree == NULL) return;
+    for(int i = 0; i <= tree ->coun; i++)
+        destroytree(tree ->child[i]);
+    delete tree;
 }
 
 int deleteBTtree(BTNode *tree,int a)
@@ -382,7 +404,6 @@ int deleteBTtree(BTNode *tree,int a)
                 break;
             p = p ->child[0];
         }
-        cout<<p ->key[0].num<<endl;//---------------
         w.pono ->key[w.inpoint] = p ->key[0];
        for(int i = 0;i < p ->coun-1;i++){
             p ->key[i] = p ->key[i+1];
@@ -473,9 +494,10 @@ int main(void)
         switch(a){
             case 1:
                 for(int i = 0;i < 15;i++){
-                    if(insertbtree(&root,data[i]) == 0)
+                    if(insertbtree(&root,data[i]) == 0){
                         cout <<"successfully!"<<endl;
-                        show(root,1);
+                    }
+                    show(root,1);
                 }
                 cout <<root ->coun;
                 cout <<"finish input"<<endl<<endl;
